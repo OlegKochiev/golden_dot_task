@@ -1,0 +1,56 @@
+.currency {
+  margin: 0 auto;
+  max-width: fit-content;
+
+  &__title {
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  &__item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    padding: 10px 0;
+    border-top: 1px solid #000;
+
+    &:last-child {
+      border-bottom: 1px solid #000;
+    }
+
+    span {
+      padding: 0 10px;
+    }
+  }
+
+  &__count {
+    width: 30px;
+  }
+
+  &__code {
+    width: 100px;
+    text-align: center;
+  }
+
+  &__name {
+    width: 80px;
+    text-align: center;
+  }
+
+  &__value {
+    width: 100px;
+  }
+
+  &__diff {
+    width: 100px;
+  }
+}
