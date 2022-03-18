@@ -10,11 +10,10 @@ function currencyRequest() {
 
 
 function renderCurrencyDatas(currencyDatas) {
-
+  const ul = document.querySelector('.currency__list');
   const valuteList = currencyDatas.Valute
   for (let item in valuteList) {
     const different = ((Number(valuteList[item].Value) - Number(valuteList[item].Previous)) / Number(valuteList[item].Value) * 100).toFixed(2);
-    console.log(Number(valuteList[item].Value));
     let li =
       `
       <li class="currency__item">
@@ -23,10 +22,14 @@ function renderCurrencyDatas(currencyDatas) {
         <span class="currency__name">${ valuteList[item].CharCode }</span>
         <span class="currency__value">${ valuteList[item].Value }</span>
         <span class="currency__diff">${ different }%</span>
+        <span class="currency__tooltip">${ valuteList[item].Name }</span>
       </li>
     `;
-    const ul = document.querySelector('.currency__list');
     ul.innerHTML += li;
+    const lastLi = ul.lastChild.previousSibling;
+    lastLi.addEventListener('click', (event) => {
+
+    })
   }
 
 }
