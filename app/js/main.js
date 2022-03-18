@@ -2,8 +2,6 @@ function currencyRequest() {
   fetch('https://www.cbr-xml-daily.ru/daily_json.js')
     .then(response => response.json())
     .then(currencyDatas => {
-      document.querySelector('.test').innerHTML = currencyDatas.toString();
-      console.log(currencyDatas);
       renderCurrencyDatas(currencyDatas);
     })
 }
@@ -11,29 +9,48 @@ function currencyRequest() {
 
 function renderCurrencyDatas(currencyDatas) {
   const ul = document.querySelector('.currency__list');
-  const valuteList = currencyDatas.Valute
-  for (let item in valuteList) {
-    const different = ((Number(valuteList[item].Value) - Number(valuteList[item].Previous)) / Number(valuteList[item].Value) * 100).toFixed(2);
-    let li =
-      `
-      <li class="currency__item">
-        <span class="currency__count"></span>
-        <span class="currency__code">${ valuteList[item].NumCode }</span>
-        <span class="currency__name">${ valuteList[item].CharCode }</span>
-        <span class="currency__value">${ valuteList[item].Value }</span>
-        <span class="currency__diff">${ different }%</span>
-        <span class="currency__tooltip">${ valuteList[item].Name }</span>
-      </li>
-    `;
-    ul.innerHTML += li;
-    const lastLi = ul.lastChild.previousSibling;
-    lastLi.addEventListener('click', (event) => {
-
-    })
+  const currencyList = currencyDatas.Valute;
+  let counter = 0;
+  for (let item in currencyList) {
+    ul.appendChild(getLiItem(currencyList[item], counter))
+    counter++;
   }
-
 }
 
+function getLiItem(currency, counter) {
+  const liItem = document.createElement('li');
+  const spanCount = document.createElement('span');
+  const spanCode = document.createElement('span');
+  const spanName = document.createElement('span');
+  const spanValue = document.createElement('span');
+  const spanDiff = document.createElement('span');
+  const spanTooltip = document.createElement('span');
+  const different = ((Number(currency.Value) - Number(currency.Previous)) / Number(currency.Value) * 100).toFixed(2);
+
+  liItem.classList.add('currency__item');
+  spanCount.classList.add('currency__count');
+  spanCode.classList.add('currency__code');
+  spanName.classList.add('currency__name');
+  spanValue.classList.add('currency__value');
+  spanDiff.classList.add('currency__diff');
+  spanTooltip.classList.add('currency__tooltip');
+
+  spanCount.innerHTML = counter;
+  spanCode.innerHTML = currency.NumCode
+  spanName.innerHTML = currency.CharCode
+  spanValue.innerHTML = currency.Value
+  spanDiff.innerHTML = different
+  spanTooltip.innerHTML = currency.Name
+
+  liItem.appendChild(spanCount);
+  liItem.appendChild(spanCode);
+  liItem.appendChild(spanName);
+  liItem.appendChild(spanValue);
+  liItem.appendChild(spanDiff);
+  liItem.appendChild(spanTooltip);
+
+  return liItem;
+}
 currencyRequest()
 
 
