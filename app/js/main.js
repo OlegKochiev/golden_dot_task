@@ -11,7 +11,7 @@ const EXCHANGE_RATE_LIST = [];
 
 function currencyRequest(requestDatas) {
   const url = getUrl(requestDatas.type, requestDatas.date);
-  fetch(url)
+  return fetch(url)
     .then(response => {
       if (response.ok) {
         return response.json();
@@ -19,18 +19,6 @@ function currencyRequest(requestDatas) {
         throw new Error('Request error');
       }
     })
-    .then(currencyDatas => {
-      switch (requestDatas.type) {
-        case REQUEST_TYPE.CURRENT:
-          renderCurrentCurrency(currencyDatas);
-          break;
-        case REQUEST_TYPE.DAILY:
-          console.log(requestDatas);
-          renderDailyCurrency(currencyDatas, requestDatas);
-          break;
-      }
-    })
-    .catch();
 }
 
 function renderCurrentCurrency(currencyDatas) {
@@ -94,15 +82,16 @@ function getLiItem(currency, counter) {
   liItem.appendChild(spanTooltip);
 
   liItem.addEventListener('click', function () {
+    const currencyRequestArray = [];
     const valuteCharCode = this.querySelector('.currency__name').textContent;
-    for (let day = 1; day <= DAYS_COUNT; day++) {
-      const date = getDate(day);
+    for (let dayAgo = 1; dayAgo <= DAYS_COUNT; dayAgo++) {
+      const date = getDate(dayAgo);
       const requestDatas = {
         type: REQUEST_TYPE.DAILY,
         date: date,
         valuteCharCode: valuteCharCode
       }
-      setTimeout(currencyRequest, 250 * day, requestDatas);
+      setTimeout(currencyRequest, 250 * dayAgo, requestDatas);
     }
   })
   return liItem;
@@ -123,6 +112,14 @@ function getDate(day) {
 }
 
 
-currencyRequest({
-  type: REQUEST_TYPE.CURRENT
-});
+
+function getCurrentCurrency() {
+  currencyRequest({
+      type: REQUEST_TYPE.CURRENT
+    })
+    .then(currencyDatas => {
+      renderCurrentCurrency(currencyDatas);
+    })
+}
+
+getCurrentCurrency();
