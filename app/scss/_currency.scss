@@ -23,6 +23,7 @@
     flex-grow: 1;
     padding: 10px 0;
     border-top: 1px solid #000;
+    transition: background-color 0.2s;
 
     span {
       padding: 0 10px;
@@ -33,6 +34,9 @@
     }
 
     &:hover {
+      cursor: pointer;
+      background-color: rgb(209, 209, 209);
+
       .currency__tooltip {
         visibility: visible;
       }
@@ -59,7 +63,7 @@
   }
 
   &__diff {
-    width: 100px;
+    width: 120px;
   }
 
   &__tooltip {
