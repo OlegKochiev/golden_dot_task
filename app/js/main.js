@@ -9,7 +9,16 @@ const REQUEST_TYPE = {
 
 const EXCHANGE_RATE_LIST = [];
 
-function currencyRequest(requestDatas) {
+const DELAY_MS = 250;
+
+async function getCurrentCurrency() {
+  const currencyDatas = await currentCurrencyRequest({
+    type: REQUEST_TYPE.CURRENT
+  })
+  currentCurrencyRender(currencyDatas);
+}
+
+function currentCurrencyRequest(requestDatas) {
   const url = getUrl(requestDatas.type, requestDatas.date);
   return fetch(url)
     .then(response => {
@@ -18,10 +27,10 @@ function currencyRequest(requestDatas) {
       } else {
         throw new Error('Request error');
       }
-    })
+    });
 }
 
-function renderCurrentCurrency(currencyDatas) {
+function currentCurrencyRender(currencyDatas) {
   const ul = document.querySelector('.currency__list');
   const currencyList = currencyDatas.Valute;
   let counter = 1;
@@ -31,21 +40,27 @@ function renderCurrentCurrency(currencyDatas) {
   }
 }
 
-function renderDailyCurrency(currencyDatas, requestDatas) {
-  const valute = currencyDatas['Valute'];
+async function dailyCurrencyRequest(requestDatas) {
+  const url = getUrl(requestDatas.type, requestDatas.date);
+  const dailyDatas = await fetch(url)
+    .then(response => {
+      if (response.ok) {
+        // console.log(response);
+        return response.json();
+      } else {
+        console.log(response);
+        EXCHANGE_RATE_LIST.unshift(EXCHANGE_RATE_LIST[EXCHANGE_RATE_LIST.length - 1]);
+      }
+    })
+  EXCHANGE_RATE_LIST.unshift(extractDailyDatas(dailyDatas, requestDatas))
+}
 
-  EXCHANGE_RATE_LIST.unshift({
+function extractDailyDatas(currencyDatas, requestDatas) {
+  const valute = currencyDatas['Valute'];
+  return {
     date: requestDatas.date,
     charCode: valute[requestDatas.valuteCharCode]['CharCode'],
     value: valute[requestDatas.valuteCharCode]['Value']
-  })
-
-  console.log(requestDatas.date + ' -> ' + valute[requestDatas.valuteCharCode]['CharCode'] + ' - ' + valute[requestDatas.valuteCharCode]['Value']);
-}
-
-function extractExchangeRate(currencyDatas) {
-  const exchangeRate = {
-
   }
 }
 
@@ -81,8 +96,7 @@ function getLiItem(currency, counter) {
   liItem.appendChild(spanDiff);
   liItem.appendChild(spanTooltip);
 
-  liItem.addEventListener('click', function () {
-    const currencyRequestArray = [];
+  liItem.addEventListener('click', async function () {
     const valuteCharCode = this.querySelector('.currency__name').textContent;
     for (let dayAgo = 1; dayAgo <= DAYS_COUNT; dayAgo++) {
       const date = getDate(dayAgo);
@@ -91,8 +105,9 @@ function getLiItem(currency, counter) {
         date: date,
         valuteCharCode: valuteCharCode
       }
-      setTimeout(currencyRequest, 250 * dayAgo, requestDatas);
+      setTimeout(dailyCurrencyRequest, DELAY_MS * dayAgo, requestDatas);
     }
+    console.log(EXCHANGE_RATE_LIST);
   })
   return liItem;
 }
@@ -112,14 +127,5 @@ function getDate(day) {
 }
 
 
-
-function getCurrentCurrency() {
-  currencyRequest({
-      type: REQUEST_TYPE.CURRENT
-    })
-    .then(currencyDatas => {
-      renderCurrentCurrency(currencyDatas);
-    })
-}
 
 getCurrentCurrency();
