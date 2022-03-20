@@ -7,7 +7,7 @@ const REQUEST_TYPE = {
   DAILY: 'daily'
 }
 
-const DELAY_MS = 250;
+const DELAY_MS = 200;
 
 async function getCurrentCurrency() {
   const currencyDatas = await currentCurrencyRequest({
@@ -40,15 +40,20 @@ function currentCurrencyRender(currencyDatas) {
 
 async function getDailyCurrency(requestDatas) {
   const exchangeRateList = [];
-  for (let day = 1; day <= DAYS_COUNT; day++) {
-    let date = getDate(day);
+  for (let daysAgo = 1; daysAgo <= DAYS_COUNT; daysAgo++) {
+    let date = getDate(daysAgo);
     let url = getUrl(REQUEST_TYPE.DAILY, date);
     requestDatas.date = date;
     requestDatas.url = url;
     exchangeRateList.unshift(await dailyCurrencyRequest(requestDatas));
     await delay();
   }
-  console.log(exchangeRateList);
+  const responseDatas = {
+    name: requestDatas.valuteName,
+    context: requestDatas.context,
+    exchangeRateList: exchangeRateList
+  }
+  console.log(responseDatas);
 }
 
 function dailyCurrencyRequest(requestDatas) {
@@ -64,7 +69,6 @@ function dailyCurrencyRequest(requestDatas) {
       const valuteList = dailyDatas['Valute'];
       return {
         date: requestDatas.date,
-        valuteName: requestDatas.valuteName,
         valuteValue: valuteList[requestDatas.valuteName].Value,
         timecode: Date.now()
       };
@@ -82,7 +86,7 @@ function delay() {
 
 function getDate(day) {
   const currentDate = new Date().getTime();
-  const dayAgoDate = new Date(currentDate - 1000 * 60 * 60 * 24 * day);
+  const dayAgoDate = new Date(currentDate - 1000 * 3600 * 24 * day);
   return dayAgoDate.toLocaleDateString('en-ca').replaceAll('-', '/');
 }
 
@@ -93,49 +97,6 @@ function getUrl(requestType, date) {
     return REQUEST_URL.replace('/currency-date', `/archive/${ date }`)
   }
 }
-
-
-// async function getDailyCurrency() {
-//   const valuteCharCode = this.querySelector('.currency__name').textContent;
-//   for (let dayAgo = 1; dayAgo <= DAYS_COUNT; dayAgo++) {
-//     const date = getDate(dayAgo);
-//     const requestDatas = {
-//       type: REQUEST_TYPE.DAILY,
-//       date: date,
-//       valuteCharCode: valuteCharCode
-//     }
-//     setTimeout(dailyCurrencyRequest, DELAY_MS * dayAgo, requestDatas);
-//   }
-// }
-
-// async function dailyCurrencyRequest(requestDatas) {
-//   const url = getUrl(requestDatas.type, requestDatas.date);
-//   const dailyDatas = await fetch(url)
-//     .then(response => {
-//       if (response.ok) {
-//         return response.json();
-//       } else {
-//         return new Error('Hi bobik');
-//       }
-//     })
-//     .then((dailyDatas) => {
-//       exchangeRateList.unshift(extractDailyDatas(dailyDatas, requestDatas));
-//     })
-//     .catch(error => {
-//       exchangeRateList.unshift({});
-//     })
-// }
-
-// function extractDailyDatas(currencyDatas, requestDatas) {
-//   const valute = currencyDatas['Valute'];
-//   return {
-//     date: requestDatas.date,
-//     charCode: valute[requestDatas.valuteCharCode]['CharCode'],
-//     value: valute[requestDatas.valuteCharCode]['Value'],
-//     timeCode: Date.now(),
-//     day: 1
-//   }
-// }
 
 function getLiItem(currency, counter) {
   const liItem = document.createElement('li');
@@ -169,8 +130,9 @@ function getLiItem(currency, counter) {
   liItem.appendChild(spanDiff);
   liItem.appendChild(spanTooltip);
 
-  liItem.addEventListener('click', () => {
+  liItem.addEventListener('click', (event) => {
     getDailyCurrency({
+      context: event.target,
       valuteName: currency.CharCode
     })
   })
