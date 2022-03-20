@@ -40,19 +40,35 @@ function currentCurrencyRender(currencyDatas) {
   }
 }
 
+async function getDailyCurrency() {
+  const valuteCharCode = this.querySelector('.currency__name').textContent;
+  for (let dayAgo = 1; dayAgo <= DAYS_COUNT; dayAgo++) {
+    const date = getDate(dayAgo);
+    const requestDatas = {
+      type: REQUEST_TYPE.DAILY,
+      date: date,
+      valuteCharCode: valuteCharCode
+    }
+    setTimeout(dailyCurrencyRequest, DELAY_MS * dayAgo, requestDatas);
+  }
+}
+
 async function dailyCurrencyRequest(requestDatas) {
   const url = getUrl(requestDatas.type, requestDatas.date);
   const dailyDatas = await fetch(url)
     .then(response => {
       if (response.ok) {
-        // console.log(response);
         return response.json();
       } else {
-        console.log(response);
-        EXCHANGE_RATE_LIST.unshift(EXCHANGE_RATE_LIST[EXCHANGE_RATE_LIST.length - 1]);
+        return new Error('Hi bobik');
       }
     })
-  EXCHANGE_RATE_LIST.unshift(extractDailyDatas(dailyDatas, requestDatas))
+    .then((dailyDatas) => {
+      EXCHANGE_RATE_LIST.unshift(extractDailyDatas(dailyDatas, requestDatas));
+    })
+    .catch(error => {
+      EXCHANGE_RATE_LIST.unshift({});
+    })
 }
 
 function extractDailyDatas(currencyDatas, requestDatas) {
@@ -60,7 +76,9 @@ function extractDailyDatas(currencyDatas, requestDatas) {
   return {
     date: requestDatas.date,
     charCode: valute[requestDatas.valuteCharCode]['CharCode'],
-    value: valute[requestDatas.valuteCharCode]['Value']
+    value: valute[requestDatas.valuteCharCode]['Value'],
+    timeCode: Date.now(),
+    day: 1
   }
 }
 
@@ -96,19 +114,7 @@ function getLiItem(currency, counter) {
   liItem.appendChild(spanDiff);
   liItem.appendChild(spanTooltip);
 
-  liItem.addEventListener('click', async function () {
-    const valuteCharCode = this.querySelector('.currency__name').textContent;
-    for (let dayAgo = 1; dayAgo <= DAYS_COUNT; dayAgo++) {
-      const date = getDate(dayAgo);
-      const requestDatas = {
-        type: REQUEST_TYPE.DAILY,
-        date: date,
-        valuteCharCode: valuteCharCode
-      }
-      setTimeout(dailyCurrencyRequest, DELAY_MS * dayAgo, requestDatas);
-    }
-    console.log(EXCHANGE_RATE_LIST);
-  })
+  liItem.addEventListener('click', dailyRecursyRequest)
   return liItem;
 }
 
@@ -128,4 +134,50 @@ function getDate(day) {
 
 
 
+
+async function dailyRecursyRequest() {
+  let urls = [];
+
+  for (let day = 1; day <= DAYS_COUNT; day++) {
+    urls.unshift(getUrl(REQUEST_TYPE.DAILY, getDate(day)));
+  }
+
+  const requestsArray = [];
+
+  for (let url of urls) {
+    // console.log(url);
+    fetchFunc(url);
+    await delay();
+  }
+
+  Promise.allSettled(requestsArray)
+    .then(() => {
+      console.log(EXCHANGE_RATE_LIST);
+    })
+
+}
+
+
+
+function fetchFunc(url) {
+  return fetch(url)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        return new Error('Error');
+      }
+    })
+    .then((dailyDatas) => {
+      // console.log(dailyDatas);
+      EXCHANGE_RATE_LIST.unshift(dailyDatas);
+    })
+}
+
+function delay() {
+  return new Promise(resolve => setTimeout(resolve, DELAY_MS));
+}
+
 getCurrentCurrency();
+
+// dailyRecursyRequest()
