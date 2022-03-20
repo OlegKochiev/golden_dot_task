@@ -78,8 +78,6 @@ function dailyCurrencyRequest(requestDatas) {
     })
 }
 
-
-
 function delay() {
   return new Promise(resolve => setTimeout(resolve, DELAY_MS));
 }
