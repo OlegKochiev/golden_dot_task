@@ -7,8 +7,6 @@ const REQUEST_TYPE = {
   DAILY: 'daily'
 }
 
-let exchangeRateList = [];
-
 const DELAY_MS = 250;
 
 async function getCurrentCurrency() {
@@ -19,7 +17,6 @@ async function getCurrentCurrency() {
 }
 
 function currentCurrencyRequest(requestDatas) {
-  console.log(requestDatas.date);
   const url = getUrl(requestDatas.type);
   return fetch(url)
     .then(response => {
@@ -42,13 +39,13 @@ function currentCurrencyRender(currencyDatas) {
 }
 
 async function getDailyCurrency(requestDatas) {
-  exchangeRateList = [];
+  const exchangeRateList = [];
   for (let day = 1; day <= DAYS_COUNT; day++) {
     let date = getDate(day);
     let url = getUrl(REQUEST_TYPE.DAILY, date);
     requestDatas.date = date;
     requestDatas.url = url;
-    dailyCurrencyRequest(requestDatas);
+    exchangeRateList.unshift(await dailyCurrencyRequest(requestDatas));
     await delay();
   }
   console.log(exchangeRateList);
@@ -65,14 +62,15 @@ function dailyCurrencyRequest(requestDatas) {
     })
     .then((dailyDatas) => {
       const valuteList = dailyDatas['Valute'];
-      exchangeRateList.unshift({
+      return {
         date: requestDatas.date,
         valuteName: requestDatas.valuteName,
-        valuteValue: valuteList[requestDatas.valuteName].Value
-      });
+        valuteValue: valuteList[requestDatas.valuteName].Value,
+        timecode: Date.now()
+      };
     })
     .catch(() => {
-      exchangeRateList.unshift({});
+      return {};
     })
 }
 
@@ -128,16 +126,16 @@ function getUrl(requestType, date) {
 //     })
 // }
 
-function extractDailyDatas(currencyDatas, requestDatas) {
-  const valute = currencyDatas['Valute'];
-  return {
-    date: requestDatas.date,
-    charCode: valute[requestDatas.valuteCharCode]['CharCode'],
-    value: valute[requestDatas.valuteCharCode]['Value'],
-    timeCode: Date.now(),
-    day: 1
-  }
-}
+// function extractDailyDatas(currencyDatas, requestDatas) {
+//   const valute = currencyDatas['Valute'];
+//   return {
+//     date: requestDatas.date,
+//     charCode: valute[requestDatas.valuteCharCode]['CharCode'],
+//     value: valute[requestDatas.valuteCharCode]['Value'],
+//     timeCode: Date.now(),
+//     day: 1
+//   }
+// }
 
 function getLiItem(currency, counter) {
   const liItem = document.createElement('li');
