@@ -7,7 +7,7 @@ const REQUEST_TYPE = {
   DAILY: 'daily'
 }
 
-const EXCHANGE_RATE_LIST = [];
+let exchangeRateList = [];
 
 const DELAY_MS = 250;
 
@@ -19,7 +19,8 @@ async function getCurrentCurrency() {
 }
 
 function currentCurrencyRequest(requestDatas) {
-  const url = getUrl(requestDatas.type, requestDatas.date);
+  console.log(requestDatas.date);
+  const url = getUrl(requestDatas.type);
   return fetch(url)
     .then(response => {
       if (response.ok) {
@@ -40,36 +41,92 @@ function currentCurrencyRender(currencyDatas) {
   }
 }
 
-async function getDailyCurrency() {
-  const valuteCharCode = this.querySelector('.currency__name').textContent;
-  for (let dayAgo = 1; dayAgo <= DAYS_COUNT; dayAgo++) {
-    const date = getDate(dayAgo);
-    const requestDatas = {
-      type: REQUEST_TYPE.DAILY,
-      date: date,
-      valuteCharCode: valuteCharCode
-    }
-    setTimeout(dailyCurrencyRequest, DELAY_MS * dayAgo, requestDatas);
+async function getDailyCurrency(requestDatas) {
+  exchangeRateList = [];
+  for (let day = 1; day <= DAYS_COUNT; day++) {
+    let date = getDate(day);
+    let url = getUrl(REQUEST_TYPE.DAILY, date);
+    requestDatas.date = date;
+    requestDatas.url = url;
+    dailyCurrencyRequest(requestDatas);
+    await delay();
   }
+  console.log(exchangeRateList);
 }
 
-async function dailyCurrencyRequest(requestDatas) {
-  const url = getUrl(requestDatas.type, requestDatas.date);
-  const dailyDatas = await fetch(url)
+function dailyCurrencyRequest(requestDatas) {
+  return fetch(requestDatas.url)
     .then(response => {
       if (response.ok) {
         return response.json();
       } else {
-        return new Error('Hi bobik');
+        return new Error('Error');
       }
     })
     .then((dailyDatas) => {
-      EXCHANGE_RATE_LIST.unshift(extractDailyDatas(dailyDatas, requestDatas));
+      const valuteList = dailyDatas['Valute'];
+      exchangeRateList.unshift({
+        date: requestDatas.date,
+        valuteName: requestDatas.valuteName,
+        valuteValue: valuteList[requestDatas.valuteName].Value
+      });
     })
-    .catch(error => {
-      EXCHANGE_RATE_LIST.unshift({});
+    .catch(() => {
+      exchangeRateList.unshift({});
     })
 }
+
+
+
+function delay() {
+  return new Promise(resolve => setTimeout(resolve, DELAY_MS));
+}
+
+function getDate(day) {
+  const currentDate = new Date().getTime();
+  const dayAgoDate = new Date(currentDate - 1000 * 60 * 60 * 24 * day);
+  return dayAgoDate.toLocaleDateString('en-ca').replaceAll('-', '/');
+}
+
+function getUrl(requestType, date) {
+  if (requestType === REQUEST_TYPE.CURRENT) {
+    return REQUEST_URL.replace('/currency-date', '');
+  } else {
+    return REQUEST_URL.replace('/currency-date', `/archive/${ date }`)
+  }
+}
+
+
+// async function getDailyCurrency() {
+//   const valuteCharCode = this.querySelector('.currency__name').textContent;
+//   for (let dayAgo = 1; dayAgo <= DAYS_COUNT; dayAgo++) {
+//     const date = getDate(dayAgo);
+//     const requestDatas = {
+//       type: REQUEST_TYPE.DAILY,
+//       date: date,
+//       valuteCharCode: valuteCharCode
+//     }
+//     setTimeout(dailyCurrencyRequest, DELAY_MS * dayAgo, requestDatas);
+//   }
+// }
+
+// async function dailyCurrencyRequest(requestDatas) {
+//   const url = getUrl(requestDatas.type, requestDatas.date);
+//   const dailyDatas = await fetch(url)
+//     .then(response => {
+//       if (response.ok) {
+//         return response.json();
+//       } else {
+//         return new Error('Hi bobik');
+//       }
+//     })
+//     .then((dailyDatas) => {
+//       exchangeRateList.unshift(extractDailyDatas(dailyDatas, requestDatas));
+//     })
+//     .catch(error => {
+//       exchangeRateList.unshift({});
+//     })
+// }
 
 function extractDailyDatas(currencyDatas, requestDatas) {
   const valute = currencyDatas['Valute'];
@@ -114,70 +171,12 @@ function getLiItem(currency, counter) {
   liItem.appendChild(spanDiff);
   liItem.appendChild(spanTooltip);
 
-  liItem.addEventListener('click', dailyRecursyRequest)
+  liItem.addEventListener('click', () => {
+    getDailyCurrency({
+      valuteName: currency.CharCode
+    })
+  })
   return liItem;
 }
 
-function getUrl(requestType, date) {
-  if (requestType === REQUEST_TYPE.CURRENT) {
-    return REQUEST_URL.replace('/currency-date', '');
-  } else {
-    return REQUEST_URL.replace('/currency-date', `/archive/${ date }`)
-  }
-}
-
-function getDate(day) {
-  const currentDate = new Date().getTime();
-  const dayAgoDate = new Date(currentDate - 1000 * 60 * 60 * 24 * day);
-  return dayAgoDate.toLocaleDateString('en-ca').replaceAll('-', '/');
-}
-
-
-
-
-async function dailyRecursyRequest() {
-  let urls = [];
-
-  for (let day = 1; day <= DAYS_COUNT; day++) {
-    urls.unshift(getUrl(REQUEST_TYPE.DAILY, getDate(day)));
-  }
-
-  const requestsArray = [];
-
-  for (let url of urls) {
-    // console.log(url);
-    fetchFunc(url);
-    await delay();
-  }
-
-  Promise.allSettled(requestsArray)
-    .then(() => {
-      console.log(EXCHANGE_RATE_LIST);
-    })
-
-}
-
-
-
-function fetchFunc(url) {
-  return fetch(url)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        return new Error('Error');
-      }
-    })
-    .then((dailyDatas) => {
-      // console.log(dailyDatas);
-      EXCHANGE_RATE_LIST.unshift(dailyDatas);
-    })
-}
-
-function delay() {
-  return new Promise(resolve => setTimeout(resolve, DELAY_MS));
-}
-
 getCurrentCurrency();
-
-// dailyRecursyRequest()
