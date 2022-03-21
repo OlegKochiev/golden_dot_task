@@ -38,9 +38,10 @@ function currentCurrencyRender(currencyDatas) {
 }
 
 async function getDailyCurrency(requestDatas) {
+  startStopLoader()
   const exchangeRateList = [];
   for (let daysAgo = 1; daysAgo <= DAYS_COUNT; daysAgo++) {
-    move(daysAgo);
+
     let date = getDate(daysAgo);
     let url = getUrl(REQUEST_TYPE.DAILY, date);
     requestDatas.date = date;
@@ -53,6 +54,7 @@ async function getDailyCurrency(requestDatas) {
     context: requestDatas.context,
     exchangeRateList: exchangeRateList
   }
+  startStopLoader();
   console.log(responseDatas);
 }
 
@@ -123,7 +125,6 @@ function addTableRow(currency, counter) {
 getCurrentCurrency();
 
 
-function move(offset) {
-  let bar = document.querySelector(".progress__bar");
-  bar.style.width = offset * 10 + "%";
+function startStopLoader() {
+  document.querySelector('.loader').classList.toggle('loader__active');
 }
