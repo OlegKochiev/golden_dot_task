@@ -40,6 +40,7 @@ function currentCurrencyRender(currencyDatas) {
 async function getDailyCurrency(requestDatas) {
   const exchangeRateList = [];
   for (let daysAgo = 1; daysAgo <= DAYS_COUNT; daysAgo++) {
+    move(daysAgo);
     let date = getDate(daysAgo);
     let url = getUrl(REQUEST_TYPE.DAILY, date);
     requestDatas.date = date;
@@ -111,7 +112,6 @@ function addTableRow(currency, counter) {
   tableBody.insertAdjacentHTML('beforeend', tableRow);
   const lastTableRow = tableBody.lastElementChild;
   lastTableRow.addEventListener('click', (event) => {
-    move();
     const rowItem = event.target.parentNode;
     const valuteName = rowItem.getAttribute('data-valute-name');
     getDailyCurrency({
@@ -123,22 +123,7 @@ function addTableRow(currency, counter) {
 getCurrentCurrency();
 
 
-function move(i = 0) {
-  if (i == 0) {
-    i = 1;
-    var elem = document.querySelector(".progress__bar");
-    console.log(elem);
-    var width = 1;
-    var id = setInterval(frame, 10);
-
-    function frame() {
-      if (width >= 100) {
-        clearInterval(id);
-        i = 0;
-      } else {
-        width++;
-        elem.style.width = width + "%";
-      }
-    }
-  }
+function move(offset) {
+  let bar = document.querySelector(".progress__bar");
+  bar.style.width = offset * 10 + "%";
 }

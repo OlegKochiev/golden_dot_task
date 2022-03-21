@@ -11,7 +11,9 @@
     }
 
     &__row {
-      border-bottom: 1px solid #000;
+      &:hover {
+        background-color: rgb(209, 209, 209);
+      }
     }
 
     &__cell {
@@ -27,7 +29,7 @@
   background-color: grey;
 
   &__bar {
-    width: 1%;
+    width: 0;
     height: 30px;
     background-color: green;
   }
