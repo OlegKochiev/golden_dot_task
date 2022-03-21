@@ -29,11 +29,10 @@ function currentCurrencyRequest(requestDatas) {
 }
 
 function currentCurrencyRender(currencyDatas) {
-  const ul = document.querySelector('.currency__list');
   const currencyList = currencyDatas.Valute;
   let counter = 1;
   for (let item in currencyList) {
-    ul.appendChild(getLiItem(currencyList[item], counter))
+    addTableRow(currencyList[item], counter);
     counter++;
   }
 }
@@ -96,45 +95,23 @@ function getUrl(requestType, date) {
   }
 }
 
-function getLiItem(currency, counter) {
-  const liItem = document.createElement('li');
-  const spanCount = document.createElement('span');
-  const spanCode = document.createElement('span');
-  const spanName = document.createElement('span');
-  const spanValue = document.createElement('span');
-  const spanDiff = document.createElement('span');
-  const spanTooltip = document.createElement('span');
-  const different = ((Number(currency.Value) - Number(currency.Previous)) / Number(currency.Value) * 100).toFixed(2);
+function addTableRow(currency, counter) {
+  const table = document.querySelector('.currency__table');
+  const difference = ((Number(currency.Value) - Number(currency.Previous)) / Number(currency.Value) * 100).toFixed(2);
+  const tableRow =
+    `<tr class="table__row table__row--body">
+      <td class="table__cell table__cell--body">${counter}</td>
+      <td class="table__cell table__cell--body">${currency.NumCode}</td>
+      <td class="table__cell table__cell--body">${currency.CharCode}</td>
+      <td class="table__cell table__cell--body">${currency.Value}<dth>
+      <td class="table__cell table__cell--body">${difference}</td>
+    </tr>`;
 
-  liItem.classList.add('currency__item');
-  spanCount.classList.add('currency__count');
-  spanCode.classList.add('currency__code');
-  spanName.classList.add('currency__name');
-  spanValue.classList.add('currency__value');
-  spanDiff.classList.add('currency__diff');
-  spanTooltip.classList.add('currency__tooltip');
-
-  spanCount.innerHTML = counter;
-  spanCode.innerHTML = currency.NumCode
-  spanName.innerHTML = currency.CharCode
-  spanValue.innerHTML = currency.Value
-  spanDiff.innerHTML = different
-  spanTooltip.innerHTML = currency.Name
-
-  liItem.appendChild(spanCount);
-  liItem.appendChild(spanCode);
-  liItem.appendChild(spanName);
-  liItem.appendChild(spanValue);
-  liItem.appendChild(spanDiff);
-  liItem.appendChild(spanTooltip);
-
-  liItem.addEventListener('click', (event) => {
-    getDailyCurrency({
-      context: event.target,
-      valuteName: currency.CharCode
-    })
+  table.insertAdjacentHTML('beforeend', tableRow);
+  const lastTableRowItem = table.lastElementChild;
+  lastTableRowItem.addEventListener('click', (event) => {
+    console.log(event.target.parentNode);
   })
-  return liItem;
 }
 
 getCurrentCurrency();
