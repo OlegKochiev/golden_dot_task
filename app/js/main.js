@@ -95,6 +95,7 @@ function getUrl(requestType, date) {
   }
 }
 
+
 function addTableRow(currency, counter) {
   const tableBody = document.querySelector('.table__body');
   const difference = ((Number(currency.Value) - Number(currency.Previous)) / Number(currency.Value) * 100).toFixed(2);
@@ -103,15 +104,41 @@ function addTableRow(currency, counter) {
       <td class="table__cell table__cell--body">${counter}</td>
       <td class="table__cell table__cell--body">${currency.NumCode}</td>
       <td class="table__cell table__cell--body">${currency.CharCode}</td>
-      <td class="table__cell table__cell--body">${currency.Value}<dth>
+      <td class="table__cell table__cell--body">${currency.Value}</td>
       <td class="table__cell table__cell--body">${difference}</td>
     </tr>`;
 
   tableBody.insertAdjacentHTML('beforeend', tableRow);
-  const lastTableRowItem = tableBody.lastElementChild;
-  lastTableRowItem.addEventListener('click', (event) => {
-    console.log(event.target.parentNode);
+  const lastTableRow = tableBody.lastElementChild;
+  lastTableRow.addEventListener('click', (event) => {
+    move();
+    const rowItem = event.target.parentNode;
+    const valuteName = rowItem.getAttribute('data-valute-name');
+    getDailyCurrency({
+      valuteName: valuteName
+    });
   })
 }
 
 getCurrentCurrency();
+
+
+function move(i = 0) {
+  if (i == 0) {
+    i = 1;
+    var elem = document.querySelector(".progress__bar");
+    console.log(elem);
+    var width = 1;
+    var id = setInterval(frame, 10);
+
+    function frame() {
+      if (width >= 100) {
+        clearInterval(id);
+        i = 0;
+      } else {
+        width++;
+        elem.style.width = width + "%";
+      }
+    }
+  }
+}

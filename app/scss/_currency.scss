@@ -1,84 +1,34 @@
 .currency {
   margin: 20px auto;
   max-width: fit-content;
+  text-align: center;
 
-  &__title {
-    margin-bottom: 20px;
-    font-size: 24px;
-    text-align: center;
-  }
+  .table {
+    display: table;
 
-  &__list {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-  }
-
-  &__item {
-    position: relative;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    flex-grow: 1;
-    padding: 10px 0;
-    border-top: 1px solid #000;
-    transition: background-color 0.2s;
-
-    span {
-      padding: 0 10px;
+    &__caption {
+      font-size: 24px;
     }
 
-    &:last-child {
+    &__row {
       border-bottom: 1px solid #000;
     }
 
-    &:hover {
-      cursor: pointer;
-      background-color: rgb(209, 209, 209);
-
-      .currency__tooltip {
-        visibility: visible;
-      }
+    &__cell {
+      padding: 5px 5px;
     }
-
   }
+}
 
-  &__count {
-    width: 30px;
-  }
+.progress {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: grey;
 
-  &__code {
-    width: 100px;
-    text-align: center;
-  }
-
-  &__name {
-    width: 80px;
-    text-align: center;
-  }
-
-  &__value {
-    width: 100px;
-  }
-
-  &__diff {
-    width: 120px;
-  }
-
-  &__tooltip {
-    position: absolute;
-    z-index: 1;
-    right: -150px;
-    width: 140px;
-    min-height: 50px;
-    padding: 5px 0;
-    visibility: hidden;
-    text-align: center;
-    border-radius: 6px;
-    color: rgb(0, 0, 0);
-    background-color: rgb(180, 180, 180);
-
-
+  &__bar {
+    width: 1%;
+    height: 30px;
+    background-color: green;
   }
 }
