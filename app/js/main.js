@@ -96,10 +96,10 @@ function getUrl(requestType, date) {
 }
 
 function addTableRow(currency, counter) {
-  const table = document.querySelector('.currency__table');
+  const tableBody = document.querySelector('.table__body');
   const difference = ((Number(currency.Value) - Number(currency.Previous)) / Number(currency.Value) * 100).toFixed(2);
   const tableRow =
-    `<tr class="table__row table__row--body">
+    `<tr class="table__row table__row--body" data-valute-name="${currency.CharCode}">
       <td class="table__cell table__cell--body">${counter}</td>
       <td class="table__cell table__cell--body">${currency.NumCode}</td>
       <td class="table__cell table__cell--body">${currency.CharCode}</td>
@@ -107,8 +107,8 @@ function addTableRow(currency, counter) {
       <td class="table__cell table__cell--body">${difference}</td>
     </tr>`;
 
-  table.insertAdjacentHTML('beforeend', tableRow);
-  const lastTableRowItem = table.lastElementChild;
+  tableBody.insertAdjacentHTML('beforeend', tableRow);
+  const lastTableRowItem = tableBody.lastElementChild;
   lastTableRowItem.addEventListener('click', (event) => {
     console.log(event.target.parentNode);
   })

@@ -10,46 +10,28 @@
 </head>
 
 <body>
-
-  <!-- <main class="main">
-    <h1 class="sr-only">Currency</h1>
-    <section class="currency-converter currency">
-      <div class="container">
-        <h2 class="currency__title">Exchange rates</h2>
-        <ul class="currency__list">
-          <li class="currency__item currency__main-item">
-            <span class="currency__count">№</span>
-            <span class="currency__code">Numcode</span>
-            <span class="currency__name">Name</span>
-            <span class="currency__value">Value, RUB</span>
-            <span class="currency__diff">Differenсу, %</span>
-          </li>
-        </ul>
-      </div>
-    </section>
-    <a href="https://www.cbr-xml-daily.ru/">Курсы валют, API</a>
-  </main> -->
-
   <main class="main">
     <h1 class="sr-only">Currency</h1>
     <section class="currency">
       <div class="container">
-        <h2 class="currency__title">Exchange rates</h2>
         <table class="currency__table table">
-          <tr class="table__row table__row--header">
-            <th class="table__cell table__cell--header">№</th>
-            <th class="table__cell table__cell--header">Numcode</th>
-            <th class="table__cell table__cell--header">Name</th>
-            <th class="table__cell table__cell--header">Value, RUB</th>
-            <th class="table__cell table__cell--header">Differenсу, %</th>
-          </tr>
+          <caption class="table__caption">Exchange rates</caption>
+          <thead class="table__head">
+            <tr class="table__row table__row--head">
+              <th class="table__cell table__cell--head">№</th>
+              <th class="table__cell table__cell--head">Numcode</th>
+              <th class="table__cell table__cell--head">Name</th>
+              <th class="table__cell table__cell--head">Value, RUB</th>
+              <th class="table__cell table__cell--head">Differenсу, %</th>
+            </tr>
+          </thead>
+          <tbody class="table__body">
+          </tbody>
         </table>
       </div>
     </section>
   </main>
-
   <script src="./js/main.js"></script>
-
 </body>
 
 </html>
