@@ -5,14 +5,21 @@
 
   .table {
     display: table;
+    border-collapse: collapse;
+    border-spacing: 20px;
 
     &__caption {
       font-size: 24px;
     }
 
     &__row {
-      &:hover {
-        background-color: rgb(209, 209, 209);
+      border-bottom: 1px solid #000;
+      transition: background-color 0.2s;
+
+      &--body {
+        &:hover {
+          background-color: rgb(209, 209, 209);
+        }
       }
     }
 
@@ -22,14 +29,13 @@
   }
 }
 
-
 .loader {
-  position: absolute;
+  position: fixed;
   display: none;
-  top: 20%;
+  top: 35%;
   left: 45%;
-  border: 16px solid #000000;
-  border-top: 16px solid #ffffff;
+  border: 16px solid #555555;
+  border-top: 16px solid #a7a7a7;
   border-radius: 50%;
   width: 120px;
   height: 120px;
