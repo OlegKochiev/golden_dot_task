@@ -17,8 +17,8 @@ async function getCurrentCurrency() {
 }
 
 async function getDailyCurrency(requestDatas) {
-  if (document.querySelector('.table__daily-list')) {
-    document.querySelector('.table__daily-list').remove();
+  if (document.querySelector('.table__row--daily')) {
+    document.querySelector('.table__row--daily').remove();
   }
   startStopLoader()
   const exchangeRateList = [];
@@ -135,9 +135,16 @@ function addTableRow(currency, counter) {
 
 function createDailyList(dailyDatas) {
   const tr = document.createElement('tr');
+  const td = document.createElement('td');
+  const ol = document.createElement('ol');
+  const h3 = document.createElement('h3');
   tr.classList.add('table__row');
-  const ul = document.createElement('ul');
-  ul.classList.add('table__daily-list');
+  tr.classList.add('table__row--daily');
+  td.classList.add('table__cell');
+  td.classList.add('table__cell--daily');
+  td.setAttribute('colspan', '5');
+  ol.classList.add('table__daily-list');
+  h3.textContent = dailyDatas.name;
   dailyDatas.exchangeRateList.forEach((valute) => {
     const li = document.createElement('li');
     const date = document.createElement('time');
@@ -146,9 +153,11 @@ function createDailyList(dailyDatas) {
     span.textContent = valute.valuteValue;
     li.appendChild(date);
     li.appendChild(span);
-    ul.appendChild(li);
+    ol.appendChild(li);
   })
-  tr.appendChild(ul);
+  td.appendChild(h3);
+  td.appendChild(ol);
+  tr.appendChild(td);
   return tr;
 }
 

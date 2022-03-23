@@ -25,6 +25,11 @@
 
     &__cell {
       padding: 5px 5px;
+
+      &--daily {
+        text-align: left;
+        padding: 10px 30px;
+      }
     }
   }
 }
