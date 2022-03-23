@@ -16,32 +16,13 @@ async function getCurrentCurrency() {
   currentCurrencyRender(currencyDatas);
 }
 
-function currentCurrencyRequest(requestDatas) {
-  const url = getUrl(requestDatas.type);
-  return fetch(url)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error('Request error');
-      }
-    });
-}
-
-function currentCurrencyRender(currencyDatas) {
-  const currencyList = currencyDatas.Valute;
-  let counter = 1;
-  for (let item in currencyList) {
-    addTableRow(currencyList[item], counter);
-    counter++;
-  }
-}
-
 async function getDailyCurrency(requestDatas) {
+  if (document.querySelector('.table__daily-list')) {
+    document.querySelector('.table__daily-list').remove();
+  }
   startStopLoader()
   const exchangeRateList = [];
   for (let daysAgo = 1; daysAgo <= DAYS_COUNT; daysAgo++) {
-
     let date = getDate(daysAgo);
     let url = getUrl(REQUEST_TYPE.DAILY, date);
     requestDatas.date = date;
@@ -55,7 +36,19 @@ async function getDailyCurrency(requestDatas) {
     exchangeRateList: exchangeRateList
   }
   startStopLoader();
-  console.log(responseDatas);
+  dailyCurrencyRender(requestDatas.context, responseDatas);
+}
+
+function currentCurrencyRequest(requestDatas) {
+  const url = getUrl(requestDatas.type);
+  return fetch(url)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Request error');
+      }
+    });
 }
 
 function dailyCurrencyRequest(requestDatas) {
@@ -80,6 +73,24 @@ function dailyCurrencyRequest(requestDatas) {
     })
 }
 
+function currentCurrencyRender(currencyDatas) {
+  const currencyList = currencyDatas.Valute;
+  let counter = 1;
+  for (let item in currencyList) {
+    addTableRow(currencyList[item], counter);
+    counter++;
+  }
+}
+
+function dailyCurrencyRender(rowItem, dailyDatas) {
+  const dailyList = createDailyList(dailyDatas);
+  // rowItem.appendChild(dailyList);
+  rowItem.after(dailyList)
+}
+
+
+
+
 function delay() {
   return new Promise(resolve => setTimeout(resolve, DELAY_MS));
 }
@@ -97,7 +108,6 @@ function getUrl(requestType, date) {
     return REQUEST_URL.replace('/currency-date', `/archive/${ date }`)
   }
 }
-
 
 function addTableRow(currency, counter) {
   const tableBody = document.querySelector('.table__body');
@@ -117,14 +127,33 @@ function addTableRow(currency, counter) {
     const rowItem = event.target.parentNode;
     const valuteName = rowItem.getAttribute('data-valute-name');
     getDailyCurrency({
-      valuteName: valuteName
+      valuteName: valuteName,
+      context: rowItem
     });
   })
 }
 
-getCurrentCurrency();
-
+function createDailyList(dailyDatas) {
+  const tr = document.createElement('tr');
+  tr.classList.add('table__row');
+  const ul = document.createElement('ul');
+  ul.classList.add('table__daily-list');
+  dailyDatas.exchangeRateList.forEach((valute) => {
+    const li = document.createElement('li');
+    const date = document.createElement('time');
+    const span = document.createElement('span');
+    date.textContent = valute.date + ' - ';
+    span.textContent = valute.valuteValue;
+    li.appendChild(date);
+    li.appendChild(span);
+    ul.appendChild(li);
+  })
+  tr.appendChild(ul);
+  return tr;
+}
 
 function startStopLoader() {
   document.querySelector('.loader').classList.toggle('loader__active');
 }
+
+getCurrentCurrency();
