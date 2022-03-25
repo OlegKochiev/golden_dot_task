@@ -25,11 +25,12 @@
     }
 
     &__row {
-      position: relative;
       border-bottom: 1px solid #000;
       transition: background-color 0.2s;
 
       &--body {
+        position: relative;
+
         &:hover {
           cursor: pointer;
           background-color: rgb(209, 209, 209);
@@ -45,33 +46,5 @@
         padding: 10px 10px 10px 50px;
       }
     }
-  }
-}
-
-.loader {
-  position: fixed;
-  display: none;
-  top: 35%;
-  left: 45%;
-  border: 16px solid #555555;
-  border-top: 16px solid #a7a7a7;
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  z-index: 1;
-  animation: spin 2s linear infinite;
-
-  &__active {
-    display: block;
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
   }
 }

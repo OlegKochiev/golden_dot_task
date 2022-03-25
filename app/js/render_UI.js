@@ -23,6 +23,9 @@ const render = {
         <td class="table__cell table__cell--body">${currency.CharCode}</td>
         <td class="table__cell table__cell--body">${currency.Value}</td>
         <td class="table__cell table__cell--body">${difference}</td>
+        <td class="table__cell table__cell--tooltip">
+          <span class="table__tooltip">${currency.Name}</span>
+        </td>
       </tr>`;
     tableBody.insertAdjacentHTML('beforeend', tableRow);
   },

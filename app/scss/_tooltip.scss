@@ -1,0 +1,21 @@
+.table {
+  &__row--body {
+    &:hover {
+      .table__tooltip {
+        display: inline-block;
+      }
+    }
+  }
+
+  &__cell--tooltip {
+    position: absolute;
+    top: -20px;
+  }
+
+  &__tooltip {
+    display: none;
+    padding: 10px;
+    background-color: rgb(133, 133, 133);
+    border-radius: 6px;
+  }
+}
