@@ -15,10 +15,10 @@ const currencyRequest = {
     const currencyDatas = await currencyRequest.doCurrentRequest({
       type: REQUEST_TYPE.CURRENT
     });
-    return currencyDatas['Valute'];
+    return currencyDatas;
   },
 
-  async getDailyDatas(requestDatas) {
+  async getDailyDatas(valuteName) {
     if (document.querySelector('.table__row--daily')) {
       document.querySelector('.table__row--daily').remove();
     }
@@ -28,11 +28,9 @@ const currencyRequest = {
       let date = currencyRequest.getDate(daysAgo);
       let url = currencyRequest.getUrl(REQUEST_TYPE.DAILY, date);
       const response = {};
-      requestDatas.date = date;
-      requestDatas.url = url;
       response.date = date;
       response.timecode = Date.now();
-      const responseValue = await currencyRequest.doDailyRequest(requestDatas);
+      const responseValue = await currencyRequest.doDailyRequest(url, valuteName);
       response.value = currencyRequest.fillEmptyDatas(exchangeRateList, responseValue);
       exchangeRateList.unshift(response);
       await currencyRequest.delay();
@@ -51,11 +49,14 @@ const currencyRequest = {
         } else {
           throw new Error('Request error');
         }
-      });
+      })
+      .then((requestDatas) => {
+        return requestDatas['Valute'];
+      })
   },
 
-  doDailyRequest(requestDatas) {
-    return fetch(requestDatas.url)
+  doDailyRequest(url, valuteName) {
+    return fetch(url)
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -65,8 +66,7 @@ const currencyRequest = {
       })
       .then((dailyDatas) => {
         const valuteList = dailyDatas['Valute'];
-        const valuteValue = valuteList[requestDatas.name].Value;
-        return valuteValue;
+        return valuteList[valuteName].Value;
       })
       .catch(() => {
         return {};
