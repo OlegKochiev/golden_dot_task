@@ -29,35 +29,23 @@ const render = {
 
   dailyCurrencyList(dailyDatas) {
     const dailyList = render.createDailyList(dailyDatas);
-    dailyDatas.context.after(dailyList);
   },
 
   createDailyList(dailyDatas) {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-    const ol = document.createElement('ol');
-    const h3 = document.createElement('h3');
-    tr.classList.add('table__row');
-    tr.classList.add('table__row--daily');
-    td.classList.add('table__cell');
-    td.classList.add('table__cell--daily');
-    td.setAttribute('colspan', '5');
-    ol.classList.add('table__daily-list');
-    h3.textContent = dailyDatas.valuteName;
+    const dailyRowTemplate =
+      `<tr class="table__row table__row--daily">
+        <td class="table__cell table__cell--daily" colspan="5">
+          <h3>${dailyDatas.valuteName}</h3>
+          <ol class="table__daily-list">
+          </ol>
+        </td>
+      </tr>`;
+    dailyDatas.context.insertAdjacentHTML('afterend', dailyRowTemplate);
+    const dailyList = document.querySelector('.table__daily-list');
     dailyDatas.dailyCurrencyDatas.forEach((valute) => {
-      const li = document.createElement('li');
-      const date = document.createElement('time');
-      const span = document.createElement('span');
-      date.textContent = valute.date + ' - ';
-      span.textContent = valute.value;
-      li.appendChild(date);
-      li.appendChild(span);
-      ol.appendChild(li);
-    })
-    td.appendChild(h3);
-    td.appendChild(ol);
-    tr.appendChild(td);
-    return tr;
+      const liItem = `<li><time>${valute.date} - </time><span>${valute.value}</span></li>`;
+      dailyList.insertAdjacentHTML('beforeend', liItem);
+    });
   },
 
   startStopLoader() {

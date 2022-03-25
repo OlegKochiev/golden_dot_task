@@ -8,16 +8,30 @@
     border-collapse: collapse;
     border-spacing: 20px;
 
+    .daily {
+      &__list {
+        position: absolute;
+        text-align: left;
+        top: -20px;
+        right: -30px;
+        padding: 25px;
+        z-index: 1;
+        background-color: #949494;
+      }
+    }
+
     &__caption {
       font-size: 24px;
     }
 
     &__row {
+      position: relative;
       border-bottom: 1px solid #000;
       transition: background-color 0.2s;
 
       &--body {
         &:hover {
+          cursor: pointer;
           background-color: rgb(209, 209, 209);
         }
       }
@@ -28,7 +42,7 @@
 
       &--daily {
         text-align: left;
-        padding: 10px 30px;
+        padding: 10px 10px 10px 50px;
       }
     }
   }
@@ -44,6 +58,7 @@
   border-radius: 50%;
   width: 120px;
   height: 120px;
+  z-index: 1;
   animation: spin 2s linear infinite;
 
   &__active {

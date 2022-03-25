@@ -13,7 +13,6 @@ async function main() {
   const currencyRows = document.querySelectorAll('.table__row--body');
   for (let currencyRow of currencyRows) {
     currencyRow.addEventListener('click', async (event) => {
-
       const rowItem = event.target.parentNode;
       const valuteName = rowItem.getAttribute('data-valute-name');
       const dailyCurrencyDatas = await currencyRequest.getDailyDatas(valuteName);
@@ -22,9 +21,7 @@ async function main() {
         context: rowItem,
         dailyCurrencyDatas: dailyCurrencyDatas
       }
-      // console.log(dailyCurrencyDatas);
       render.dailyCurrencyList(dailyDatas);
-
     })
   }
 }
