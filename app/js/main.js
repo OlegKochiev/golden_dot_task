@@ -25,13 +25,18 @@ async function getDailyCurrency(requestDatas) {
   for (let daysAgo = 1; daysAgo <= DAYS_COUNT; daysAgo++) {
     let date = getDate(daysAgo);
     let url = getUrl(REQUEST_TYPE.DAILY, date);
+    let response = {};
     requestDatas.date = date;
     requestDatas.url = url;
-    exchangeRateList.unshift(await dailyCurrencyRequest(requestDatas));
+    response.date = date;
+    response.timecode = Date.now();
+    const responseValue = await dailyCurrencyRequest(requestDatas);
+    response.value = fillEmptyDatas(exchangeRateList, responseValue);
+    exchangeRateList.unshift(response);
     await delay();
   }
   const responseDatas = {
-    name: requestDatas.valuteName,
+    name: requestDatas.name,
     context: requestDatas.context,
     exchangeRateList: exchangeRateList
   }
@@ -62,11 +67,8 @@ function dailyCurrencyRequest(requestDatas) {
     })
     .then((dailyDatas) => {
       const valuteList = dailyDatas['Valute'];
-      return {
-        date: requestDatas.date,
-        valuteValue: valuteList[requestDatas.valuteName].Value,
-        timecode: Date.now()
-      };
+      const valuteValue = valuteList[requestDatas.name].Value;
+      return valuteValue;
     })
     .catch(() => {
       return {};
@@ -82,14 +84,10 @@ function currentCurrencyRender(currencyDatas) {
   }
 }
 
-function dailyCurrencyRender(rowItem, dailyDatas) {
-  const dailyList = createDailyList(dailyDatas);
-  // rowItem.appendChild(dailyList);
-  rowItem.after(dailyList)
+function dailyCurrencyRender(rowItem, responseDatas) {
+  const dailyDatas = createDailyList(responseDatas);
+  rowItem.after(dailyDatas)
 }
-
-
-
 
 function delay() {
   return new Promise(resolve => setTimeout(resolve, DELAY_MS));
@@ -107,6 +105,17 @@ function getUrl(requestType, date) {
   } else {
     return REQUEST_URL.replace('/currency-date', `/archive/${ date }`)
   }
+}
+
+function fillEmptyDatas(exchangeRateList, responseValue) {
+  let valuteValue = 0;
+  if (typeof (responseValue) !== "object") {
+    valuteValue = responseValue;
+  } else {
+    valuteValue = exchangeRateList[0].value;
+  }
+  console.log(valuteValue);
+  return valuteValue;
 }
 
 function addTableRow(currency, counter) {
@@ -127,13 +136,13 @@ function addTableRow(currency, counter) {
     const rowItem = event.target.parentNode;
     const valuteName = rowItem.getAttribute('data-valute-name');
     getDailyCurrency({
-      valuteName: valuteName,
+      name: valuteName,
       context: rowItem
     });
   })
 }
 
-function createDailyList(dailyDatas) {
+function createDailyList(responseDatas) {
   const tr = document.createElement('tr');
   const td = document.createElement('td');
   const ol = document.createElement('ol');
@@ -144,13 +153,13 @@ function createDailyList(dailyDatas) {
   td.classList.add('table__cell--daily');
   td.setAttribute('colspan', '5');
   ol.classList.add('table__daily-list');
-  h3.textContent = dailyDatas.name;
-  dailyDatas.exchangeRateList.forEach((valute) => {
+  h3.textContent = responseDatas.name;
+  responseDatas.exchangeRateList.forEach((valute) => {
     const li = document.createElement('li');
     const date = document.createElement('time');
     const span = document.createElement('span');
     date.textContent = valute.date + ' - ';
-    span.textContent = valute.valuteValue;
+    span.textContent = valute.value;
     li.appendChild(date);
     li.appendChild(span);
     ol.appendChild(li);
