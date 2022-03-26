@@ -31,6 +31,9 @@ const render = {
   },
 
   dailyCurrencyList(dailyDatas) {
+    if (document.querySelector('.table__row--daily')) {
+      document.querySelector('.table__row--daily').remove();
+    };
     const dailyList = render.createDailyList(dailyDatas);
   },
 

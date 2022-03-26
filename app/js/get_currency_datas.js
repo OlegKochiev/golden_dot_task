@@ -12,16 +12,12 @@ import {
 const currencyRequest = {
 
   async getCurrentDatas() {
-    const currencyDatas = await currencyRequest.doCurrentRequest({
-      type: REQUEST_TYPE.CURRENT
-    });
+    const url = currencyRequest.getUrl(REQUEST_TYPE.CURRENT, '');
+    const currencyDatas = await currencyRequest.doCurrentRequest(url);
     return currencyDatas;
   },
 
   async getDailyDatas(valuteName) {
-    if (document.querySelector('.table__row--daily')) {
-      document.querySelector('.table__row--daily').remove();
-    }
     render.startStopLoader();
     const exchangeRateList = [];
     for (let daysAgo = 1; daysAgo <= DAYS_COUNT; daysAgo++) {
@@ -40,8 +36,7 @@ const currencyRequest = {
     return responseDatas;
   },
 
-  doCurrentRequest(requestDatas) {
-    const url = currencyRequest.getUrl(requestDatas.type);
+  doCurrentRequest(url) {
     return fetch(url)
       .then(response => {
         if (response.ok) {
@@ -50,8 +45,8 @@ const currencyRequest = {
           throw new Error('Request error');
         }
       })
-      .then((requestDatas) => {
-        return requestDatas['Valute'];
+      .then((currentDatas) => {
+        return currentDatas['Valute'];
       })
   },
 
